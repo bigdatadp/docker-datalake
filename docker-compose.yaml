@@ -1,0 +1,137 @@
+version: "3.3"
+
+services:
+
+  namenode:
+    image: hadoop:3.3.4
+    hostname: namenode
+    container_name: namenode
+    command: ["namenode"]
+    environment:
+      - CLUSTER_NAME=hudi_hadoop284_hive232_spark244
+    ports:
+      - "9001:9000"
+      - "9870:9870"
+      # JVM debugging port (will be mapped to a random port on host)
+      - "5005"
+    # env_file:
+    #   - ./hadoop.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://namenode:9870"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - namenode:/opt/data/dfs/name
+      - ${HADOOP}/namenode/etc/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ${HADOOP}/namenode/etc/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    
+  datanode1:
+    image: hadoop:3.3.4
+    hostname: datanode1
+    container_name: datanode1
+    command: ["datanode"]
+    environment:
+      - CLUSTER_NAME=hudi_hadoop284_hive232_spark244
+    ports:
+      # - "9000:9000"
+      - "19866:9866"
+      - "19864:9864"
+      # JVM debugging port (will be mapped to a random port on host)
+      - "5005"
+    # env_file:
+    #   - ./hadoop.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://namenode:9870"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - datanode1:/opt/data/dfs/name
+      - ${HADOOP}/datanode1/etc/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ${HADOOP}/datanode1/etc/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    links:
+      - "namenode"
+  datanode2:
+    image: hadoop:3.3.4
+    hostname: datanode2
+    container_name: datanode2
+    command: ["datanode"]
+    environment:
+      - CLUSTER_NAME=hudi_hadoop284_hive232_spark244
+    ports:
+      # - "9000:9000"
+      - "29866:9866"
+      - "29864:9864"
+      # JVM debugging port (will be mapped to a random port on host)
+      - "5005"
+    # env_file:
+    #   - ./hadoop.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://namenode:9870"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - datanode2:/opt/data/dfs/name
+      - ${HADOOP}/datanode2/etc/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ${HADOOP}/datanode2/etc/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    links:
+      - "namenode"
+  datanode3:
+    image: hadoop:3.3.4
+    hostname: datanode3
+    container_name: datanode3
+    command: ["datanode"]
+    environment:
+      - CLUSTER_NAME=hudi_hadoop284_hive232_spark244
+    ports:
+      # - "9000:9000"
+      - "39866:9866"
+      - "39864:9864"
+      # JVM debugging port (will be mapped to a random port on host)
+      - "5005"
+    # env_file:
+    #   - ./hadoop.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://namenode:9870"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - datanode3:/opt/data/dfs/name
+      - ${HADOOP}/datanode3/etc/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ${HADOOP}/datanode3/etc/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    links:
+      - "namenode"
+  hive:
+    image: hive:2.3.9
+    hostname: hive
+    container_name: hive
+    command: ["hive"]
+    environment:
+      - CLUSTER_NAME=hudi_hadoop284_hive232_spark244
+    ports:
+      # - "9000:9000"
+      - "39866:9866"
+      - "39864:9864"
+      # JVM debugging port (will be mapped to a random port on host)
+      - "5005"
+    # env_file:
+    #   - ./hadoop.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://namenode:9870"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - datanode3:/opt/data/dfs/name
+      - ${HADOOP}/datanode3/etc/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ${HADOOP}/datanode3/etc/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    links:
+      - "namenode"
+volumes:
+  namenode:
+  datanode1:
+  datanode2:
+  datanode3:
