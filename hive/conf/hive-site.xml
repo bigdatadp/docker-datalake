@@ -18,7 +18,23 @@
 <configuration>
     <property>
         <name>fs.default.name</name>
-        <value>hdfs://172.19.0.2:9000</value>
+        <value>hdfs://namenode:9000</value>
+    </property>
+    <property>
+        <name>hive.server2.thrift.port</name>
+        <value>10000</value>
+    </property>
+    <property>
+        <name>hive.server2.thrift.bind.host</name>
+        <value>0.0.0.0</value>
+    </property>
+    <property>
+        <name>hive.server2.thrift.http.port</name>
+        <value>10001</value>
+    </property>
+    <property>
+        <name>hive.server2.transport.mode</name>
+        <value>binary</value>
     </property>
     <property>
         <name>hive.server2.webui.port</name>
@@ -28,4 +44,33 @@
         <name>hive.server2.webui.host</name>
         <value>0.0.0.0</value>
     </property>
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:postgresql://postgres/postgres</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>org.postgresql.Driver</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>postgres</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>postgres</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://hivemetastore:9083</value>
+        <description>IP address (or fully-qualified domain name) and port of the metastore host</description>
+    </property>
+    <property> 
+     <name>hive.metastore.event.db.notification.api.auth</name> 
+     <value>false</value> 
+</property> 
 </configuration>

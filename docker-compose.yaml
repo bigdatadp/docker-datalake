@@ -10,7 +10,7 @@ services:
     environment:
       - CLUSTER_NAME=hudi_hadoop284_hive232_spark244
     ports:
-      - "9001:9000"
+      - "9000:9000"
       - "9870:9870"
       # JVM debugging port (will be mapped to a random port on host)
       - "5005"
@@ -105,33 +105,82 @@ services:
     links:
       - "namenode"
   hive:
-    image: hive:2.3.9
+    image: hive:3.1.3
     hostname: hive
     container_name: hive
-    command: ["hive"]
+    command: ["hiveserver2"]
+    restart: always
     environment:
       - CLUSTER_NAME=hudi_hadoop284_hive232_spark244
     ports:
       # - "9000:9000"
-      - "39866:9866"
-      - "39864:9864"
+      # - "39866:9866"
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
       # JVM debugging port (will be mapped to a random port on host)
-      - "5005"
+      # - "5005"
     # env_file:
     #   - ./hadoop.env
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://namenode:9870"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    # healthcheck:
+    #   test: ["CMD", "telnetl", "-f", "hive","10002"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
     volumes:
       - datanode3:/opt/data/dfs/name
-      - ${HADOOP}/datanode3/etc/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ${HADOOP}/datanode3/etc/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ${HIVE}/conf/hive-site.xml:/opt/hive/conf/hive-site.xml
+      - ${HADOOP}/namenode/etc/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ${HIVE}/docker-entrypoint.sh:/opt/hive/docker-entrypoint.sh
+    depends_on:
+      - hivemetastore
     links:
       - "namenode"
+      # - "hivemetastore"
+  hivemetastore:
+    image: hive:3.1.3
+    hostname: hivemetastore
+    container_name: hivemetastore
+    command: ["metastore", "postgres"]
+    restart: always
+    environment:
+      - CLUSTER_NAME=hudi_hadoop284_hive232_spark244
+    ports:
+      # - "9000:9000"
+      # - "39866:9866"
+      - "9083:9083"
+      # JVM debugging port (will be mapped to a random port on host)
+      # - "5005"
+    # env_file:
+    #   - ./hadoop.env
+    # healthcheck:
+    #   test: ["CMD", "telnetl", "-f", "hive","9083"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    volumes:
+      - datanode3:/opt/data/dfs/name
+      - ${HIVE}/conf/hive-site.xml:/opt/hive/conf/hive-site.xml
+      - ${HADOOP}/namenode/etc/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ${HIVE}/docker-entrypoint.sh:/opt/hive/docker-entrypoint.sh
+    depends_on:
+      # - hive
+      - namenode
+    links:
+      - "namenode"
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
 volumes:
   namenode:
   datanode1:
   datanode2:
   datanode3:
+networks:
+  default:
+    name: dpnetwork
+    driver: bridge
